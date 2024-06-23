@@ -1,4 +1,5 @@
 import { GetItemCommand } from "@aws-sdk/client-dynamodb";
+import { unmarshall } from "@aws-sdk/util-dynamodb";
 import { z } from "zod";
 import { client } from "./client";
 
@@ -11,9 +12,13 @@ const getUser = async () => {
       },
     })
   );
+  if (!item) {
+    throw new Error("User not found");
+  }
+  const unmarshalled = unmarshall(item);
   return newUser({
-    id: item?.id.S,
-    name: item?.name.S,
+    id: unmarshalled.id,
+    name: unmarshalled.name,
   });
 };
 
@@ -24,7 +29,7 @@ const userSchema = z.object({
 
 type User = z.infer<typeof userSchema>;
 
-const newUser = (user: Partial<User>) =>
+const newUser = (user: User) =>
   user ? userSchema.parse(user) : console.error("User not found");
 
 getUser()
