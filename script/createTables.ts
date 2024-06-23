@@ -14,6 +14,14 @@ const client = new DynamoDBClient({
 });
 
 const createUserTable = async () => {
+  const { TableNames: tableNames } = await client.send(
+    new ListTablesCommand({})
+  );
+  if (tableNames?.some((tableName) => tableName === "Users")) {
+    console.info("Users already exists");
+    return;
+  }
+
   await client.send(
     new CreateTableCommand({
       TableName: "Users",
@@ -25,13 +33,6 @@ const createUserTable = async () => {
       },
     })
   );
-
-  const { TableNames: tableNames } = await client.send(
-    new ListTablesCommand({})
-  );
-  if (!tableNames?.some((tableName) => tableName === "Users")) {
-    throw new Error("Table Users was not created");
-  }
 };
 
 createUserTable().catch((e) => console.error(e));
