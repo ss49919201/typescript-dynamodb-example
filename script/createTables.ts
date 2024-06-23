@@ -1,17 +1,8 @@
 import {
   CreateTableCommand,
-  DynamoDBClient,
   ListTablesCommand,
 } from "@aws-sdk/client-dynamodb";
-
-const client = new DynamoDBClient({
-  region: "us-west-2",
-  endpoint: "http://localhost:18000",
-  credentials: {
-    accessKeyId: "fake",
-    secretAccessKey: "fake",
-  },
-});
+import { client } from "./client";
 
 const createUserTable = async () => {
   const { TableNames: tableNames } = await client.send(
